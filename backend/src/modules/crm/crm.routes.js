@@ -1,26 +1,9 @@
 const router = require('express').Router();
-const { z } = require('zod');
 const { Lead } = require('./lead.model');
 const { auth } = require('../../shared/middleware/auth');
-const { validate } = require('../../shared/middleware/validate');
 const { paginate } = require('../../shared/utils/paginate');
 const { ok, created, noContent } = require('../../shared/utils/response');
 const ApiError = require('../../shared/utils/ApiError');
-
-const schema = z.object({
-  name: z.string().min(2),
-  email: z.string().email().optional().or(z.literal('')),
-  phone: z.string().optional(),
-  propertyType: z.enum(['APARTMENT', 'VILLA', 'OFFICE', 'LAND']).optional(),
-  targetProperty: z.string().optional(),
-  budgetMin: z.number().optional(),
-  budgetMax: z.number().optional(),
-  source: z.enum(['WEBSITE', 'WALK_IN', 'REFERRAL', 'PORTAL', 'OTHER']).optional(),
-  stage: z.enum(['NEW', 'CONTACTED', 'VIEWING', 'NEGOTIATION', 'CLOSED_WON', 'CLOSED_LOST']).optional(),
-  agent: z.string().optional(),
-  nextFollowUp: z.string().optional(),
-  notes: z.string().optional(),
-});
 
 router.use(auth);
 
@@ -41,9 +24,9 @@ router.get('/pipeline', async (_req, res) => {
   ok(res, result);
 });
 
-router.post('/', validate(schema), async (req, res) => created(res, await Lead.create(req.body)));
+router.post('/', async (req, res) => created(res, await Lead.create(req.body)));
 
-router.patch('/:id', validate(schema.partial()), async (req, res) => {
+router.patch('/:id', async (req, res) => {
   const lead = await Lead.findById(req.params.id);
   if (!lead) throw ApiError.notFound('Lead not found');
   if (req.body.stage && req.body.stage !== lead.stage) {

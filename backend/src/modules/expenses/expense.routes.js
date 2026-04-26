@@ -1,24 +1,10 @@
 const router = require('express').Router();
-const { z } = require('zod');
 const { Expense, CATEGORY_ACCOUNT } = require('./expense.model');
 const accounting = require('../accounting/accounting.service');
 const { auth, requireRole } = require('../../shared/middleware/auth');
-const { validate } = require('../../shared/middleware/validate');
 const { paginate } = require('../../shared/utils/paginate');
 const { ok, created, noContent } = require('../../shared/utils/response');
 const ApiError = require('../../shared/utils/ApiError');
-
-const schema = z.object({
-  title: z.string().min(2),
-  category: z.enum(['MAINTENANCE', 'UTILITY', 'VENDOR', 'INSURANCE', 'TAX', 'OTHER']),
-  property: z.string().optional(),
-  vendor: z.string().optional(),
-  amount: z.number().positive(),
-  date: z.string().optional(),
-  paidVia: z.enum(['CASH', 'BANK']).optional(),
-  receiptUrl: z.string().optional(),
-  notes: z.string().optional(),
-});
 
 router.use(auth);
 
@@ -52,7 +38,7 @@ router.get('/:id', async (req, res) => {
   ok(res, e);
 });
 
-router.post('/', requireRole('SUPER_ADMIN', 'MANAGER', 'ACCOUNTANT'), validate(schema), async (req, res) => {
+router.post('/', requireRole('SUPER_ADMIN', 'MANAGER', 'ACCOUNTANT'), async (req, res) => {
   const seq = (await Expense.countDocuments()) + 1;
   const acc = CATEGORY_ACCOUNT[req.body.category];
   const exp = await Expense.create({

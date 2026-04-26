@@ -1,24 +1,9 @@
 const router = require('express').Router();
-const { z } = require('zod');
 const { MaintenanceTicket } = require('./maintenance.model');
 const { auth, requireRole } = require('../../shared/middleware/auth');
-const { validate } = require('../../shared/middleware/validate');
 const { paginate } = require('../../shared/utils/paginate');
 const { ok, created, noContent } = require('../../shared/utils/response');
 const ApiError = require('../../shared/utils/ApiError');
-
-const schema = z.object({
-  title: z.string().min(2),
-  description: z.string().optional(),
-  property: z.string(),
-  tenant: z.string().optional(),
-  priority: z.enum(['LOW', 'MEDIUM', 'HIGH', 'URGENT']).optional(),
-  status: z.enum(['OPEN', 'ASSIGNED', 'IN_PROGRESS', 'RESOLVED', 'CLOSED']).optional(),
-  assigneeName: z.string().optional(),
-  vendor: z.string().optional(),
-  estimatedCost: z.number().optional(),
-  actualCost: z.number().optional(),
-});
 
 router.use(auth);
 
@@ -39,7 +24,7 @@ router.get('/:id', async (req, res) => {
   ok(res, t);
 });
 
-router.post('/', validate(schema), async (req, res) => {
+router.post('/', async (req, res) => {
   const seq = (await MaintenanceTicket.countDocuments()) + 1;
   const t = await MaintenanceTicket.create({
     ...req.body,
@@ -48,7 +33,7 @@ router.post('/', validate(schema), async (req, res) => {
   created(res, t);
 });
 
-router.patch('/:id', validate(schema.partial()), async (req, res) => {
+router.patch('/:id', async (req, res) => {
   const patch = { ...req.body };
   if (patch.status === 'RESOLVED' || patch.status === 'CLOSED') patch.resolvedAt = new Date();
   const t = await MaintenanceTicket.findByIdAndUpdate(req.params.id, patch, { new: true });
