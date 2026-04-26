@@ -24,6 +24,7 @@ import { LeadsPage } from '@pages/LeadsPage';
 import { SettingsPage } from '@pages/SettingsPage';
 import { ForbiddenPage } from '@pages/ForbiddenPage';
 import { RequirePermission } from './RequirePermission';
+import { JournalEntry } from '@pages/JournalEntry';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -68,11 +69,11 @@ export function App() {
             <Route path="/maintenance" element={<RequirePermission perm="maintenance.view"><MaintenancePage /></RequirePermission>} />
             <Route path="/accounting" element={<RequirePermission perm="accounting.view"><AccountingPage /></RequirePermission>} />
             <Route path="/accounting/owner-statements" element={<RequirePermission perm="ownerStatement.view"><OwnerStatementsPage /></RequirePermission>} />
+            <Route path="/accounting/journal-entry" element={<RequirePermission perm="ownerStatement.view"><JournalEntry /></RequirePermission>} />
             <Route path="/leads" element={<RequirePermission perm="lead.view"><LeadsPage /></RequirePermission>} />
             <Route path="/settings" element={<RequirePermission perm="user.view"><SettingsPage /></RequirePermission>} />
             <Route path="/forbidden" element={<ForbiddenPage />} />
           </Route>
-          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </BrowserRouter>
     </QueryClientProvider>

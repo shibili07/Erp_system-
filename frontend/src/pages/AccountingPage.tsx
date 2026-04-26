@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import {
   TrendingUp,
   BookOpen,
@@ -49,6 +50,7 @@ export function AccountingPage() {
   const [createOpen, setCreateOpen] = useState(false);
   const { data: pnl } = usePnL();
   const canCreateJE = useCan('accounting.journal.create');
+  const navigate = useNavigate();
 
   return (
     <>
@@ -58,7 +60,7 @@ export function AccountingPage() {
         actions={
           <>
             <Can perm="accounting.journal.create">
-              <button className="btn-secondary" onClick={() => setCreateOpen(true)}>
+              <button className="btn-secondary" onClick={() => navigate("/accounting/journal-entry")}>
                 <Plus size={16} /> New Journal Entry
               </button>
             </Can>
